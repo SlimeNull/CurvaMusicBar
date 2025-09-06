@@ -1,9 +1,11 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -27,7 +29,7 @@ namespace CurvaMusicBar
             base.OnSourceInitialized(e);
 
             // App Bar Size
-            var appBarSize = 100;
+            var appBarSize = 50;
 
             // Screen size
             var screenWidth = PInvoke.GetSystemMetrics(SystemMetric.SM_CXFULLSCREEN);
@@ -60,6 +62,65 @@ namespace CurvaMusicBar
 
             // Set window position
             PInvoke.SetWindowPos(hWnd, 0, 0, 0, screenWidth, appBarSize, 0);
+
+            // Hide in task view
+            var exStyle = (int)PInvoke.GetWindowLongPtr(hWnd, PInvoke.GWL_EXSTYLE);
+            exStyle |= 0x00000080; // WS_EX_TOOLWINDOW
+            exStyle |= 0x08000000; // WS_EX_NOACTIVATE
+            PInvoke.SetWindowLongPtr(hWnd, PInvoke.GWL_EXSTYLE, (IntPtr)exStyle);
+
+            //// Find desktop window handle
+            //IntPtr hWndDesktop = PInvoke.FindWindow("Progman", "Program Manager");
+
+            //// Make current window child of desktop window
+            //if (hWndDesktop != IntPtr.Zero)
+            //{
+            //    PInvoke.SetParent(hWnd, hWndDesktop);
+            //}
+
+            // Message hooks
+            var hwndSource = HwndSource.FromHwnd(hWnd);
+            hwndSource.AddHook(WndProcHook);
+        }
+
+        private nint WndProcHook(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
+        {
+            if (msg == 0x112)    // WM_SYSCOMMAND
+            {
+                int command = wParam.ToInt32() & 0xfff0;
+                if (command == 0xf012 ||
+                    command == 0xf020 ||
+                    command == 0xf010) // SC_MOVE + SC_MAXIMIZE
+                {
+                    handled = true;
+                }
+            }
+
+            return 0;
+        }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+
+            visualizer.SpectrumSize = 1024;
+            visualizer.StripsScaleFactor = 30;
+            visualizer.BorderThicknessScaleFactor = new Thickness(0, 1, 0, 0);
+            visualizer.EnableCircleStripsRendering = false;
+            visualizer.EnableCurveRendering = false;
+            visualizer.StripCount = 400;
+            visualizer.RenderEnabled = true;
+        }
+
+        protected override void OnStateChanged(EventArgs e)
+        {
+            base.OnStateChanged(e);
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            e.Cancel = true;
+            base.OnClosing(e);
         }
     }
 }

@@ -14,4 +14,8 @@
     <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Submodules\AudioVisualizer\LibAudioVisualizer.WPF\LibAudioVisualizer.WPF.csproj" />
+  </ItemGroup>
+
 </Project>

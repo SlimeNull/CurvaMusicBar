@@ -9,8 +9,9 @@
         WindowStyle="None"
         Title="MainWindow" Height="450" Width="800"
         Background="Black"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        xmlns:vwpf="clr-namespace:LibAudioVisualizer.WPF;assembly=LibAudioVisualizer.WPF">
     <Grid>
-
+        <vwpf:RealtimeAudioVisualizerPresenter Name="visualizer"/>
     </Grid>
 </Window>
