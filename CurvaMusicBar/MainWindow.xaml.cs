@@ -38,27 +38,29 @@ namespace CurvaMusicBar
             // Handle of current window
             IntPtr hWnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
 
-            // Register the taskbar appbar
-            PInvoke.SHAppBarMessage(0x00000000, new APPBARDATA()
+            var appBarData = new APPBARDATA()
             {
                 cbSize = sizeof(APPBARDATA),
                 hWnd = hWnd,
-            });
+            };
+
+            // Register the taskbar appbar
+            PInvoke.SHAppBarMessage(0x00000000, ref appBarData);
+
+            appBarData.uEdge = 1;
+            appBarData.rc = new RECT()
+            {
+                Left = 0,
+                Top = 0,
+                Right = screenWidth,
+                Bottom = appBarSize
+            };
+
+            // ABM_QUERYPOS
+            PInvoke.SHAppBarMessage(0x00000002, ref appBarData);
 
             // Set the taskbar appbar position
-            PInvoke.SHAppBarMessage(0x00000003, new APPBARDATA()
-            {
-                cbSize = sizeof(APPBARDATA),
-                hWnd = hWnd,
-                uEdge = 1, // ABE_TOP
-                rc = new RECT()
-                {
-                    Left = 0,
-                    Top = 0,
-                    Right = screenWidth,
-                    Bottom = appBarSize
-                }
-            });
+            PInvoke.SHAppBarMessage(0x00000003, ref appBarData);
 
             // Set window position
             PInvoke.SetWindowPos(hWnd, 0, 0, 0, screenWidth, appBarSize, 0);

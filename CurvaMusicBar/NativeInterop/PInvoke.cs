@@ -95,7 +95,7 @@ namespace CurvaMusicBar.NativeInterop
         /// </returns>
         [DllImport("shell32.dll")]
         public static extern IntPtr SHAppBarMessage(uint dwMessage,
-           [In] in APPBARDATA pData);
+           [In] ref APPBARDATA pData);
 
         [DllImport("user32.dll")]
         public static extern int GetSystemMetrics(SystemMetric smIndex);
